@@ -26,10 +26,11 @@ library(lubridate) # lubridate_1.9.3
 library(Matrix) # Matrix_1.7-0 
 library(TMB) # TMB_1.9.14 
 library(ggplot2) # ggplot2_3.5.1
+library(janitor) # janitor_2.2.0
 ```
 
 ## Data
-The RSV concentration data is found in the data folder. Set your working directory to Section 3.2 and run the following code:
+The RSV concentration data is found in the data folder and it was download from https://purl.stanford.edu/cx529np1130. Set your working directory to Section 3.2 and run the following code:
 
 ```{r, warning=FALSE, message=FALSE}
 raw_d <- read_csv("./data/SCAN_AllPlants_SDR_7April23_rev.csv")
@@ -38,6 +39,9 @@ raw_d <- read_csv("./data/SCAN_AllPlants_SDR_7April23_rev.csv")
 raw_d <- raw_d %>% 
   mutate(sample_date = ymd(paste0(Year,"-",Month,"-",Day))) %>% 
   rename(site_id = `Plant Abbr`) 
+
+# clean column names (might not need it's my habit)
+work_d <- raw_d %>% clean_names() 
 ```
 
 Here is a plot of the raw data, note if a “0” appears, it means the assay was a non-detect. The detection limit varies by sample depending on the amount of solids by dry weight included, but is between 500–1000 cp/g dry weight. RSV measurements begin on January 5th, 2022. 
@@ -49,3 +53,41 @@ ggplot(raw_d %>% filter(sample_date >= "2022-01-05"), aes(sample_date,RSV_gc_g_d
   scale_x_date(breaks=scales::pretty_breaks(n=5), name = "",date_labels ="%b")+
   theme_bw()
 ```
+
+## Prepping Data for Modeling
+The function "prep_data" will prepare the data for modeling. Here is an example of how to use this function is found below. 
+
+- Important Notes about Normalization: 
+  - If no normalization variable is used, then create a denominator column with values of ones 
+    - Example: "mutate(denom = 1)" and denom_column_name = "denom" in prep_data( ) function
+  - In this example, we will use PMMoV t normalize RSV concentrations. 
+  - Both PMMoV and RSV concentrations are measured as gc/g and therefore the PMMoV-normalized RSV concentrations are unitless. 
+  
+- Important Notes about Censoring: 
+  - If no outcome values are censored, create a censored_y column with values of FALSE
+    - Example: mutate(censored_y = FALSE)
+  - If outcome values are censored, do the two following things: 
+    - Set the censored outcome values to the detection limit. 
+    - create a censored_y column with values of FALSE if the outcome is observed and values of TRUE if the outcome is censored. 
+  - In this example, we have censored values and we will use the detection limit of 1000 cp/g.
+
+```{r, eval = FALSE}
+
+# In this example, 
+## pm_mo_v_gc_g_dry_weight is used for normalization
+## the outcome is RSV_gc_g_dry_weight
+## RSV_gc_g_dry_weight values are set to 0 if censored
+
+# So following the censored instructions above: 
+work_d < - work_d %>% 
+  mutate(censored_y = ifelse(RSV_gc_g_dry_weight == 0, TRUE, FALSE), # create censored_y column
+         RSV_gc_g_dry_weight = ifelse(y==0, 1000, y))                # set censored values to limit
+
+tmbdat <- prep_date(outcome_column_name = "",
+                    denom_column_name = "pm_mo_v_gc_g_dry_weight")  
+
+```
+
+## Prior Specifications
+
+
