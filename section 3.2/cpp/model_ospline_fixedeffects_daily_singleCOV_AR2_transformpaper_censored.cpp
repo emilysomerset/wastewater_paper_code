@@ -12,7 +12,6 @@ Type objective_function<Type>::operator() ()
   DATA_SPARSE_MATRIX(P); // Penalty matrix
   DATA_SPARSE_MATRIX(daily);
   DATA_SPARSE_MATRIX(obs); //observed data indexes
-  DATA_SPARSE_MATRIX(station);
   DATA_IVECTOR(stationsizes);
   DATA_IVECTOR(n1);
   DATA_IVECTOR(y_ind_obs);
@@ -37,9 +36,7 @@ Type objective_function<Type>::operator() ()
   int ndays = daily.cols();
   int nstation = stationsizes.size();
   int ncens = y_ind_cens.size();
-  
   int nfull = obs.cols();
-  int nobs = X.rows();
   
   vector<Type> U(d);
   vector<Type> beta(betadim);
@@ -66,7 +63,8 @@ Type objective_function<Type>::operator() ()
   Type c = pow(12,0.5)*pow(phi,-1);
   Type sigmastat = tau*sqrt(2)*pow(c,1.5);
   Type delta = 1;
-  vector<Type> eta = X * beta + B * U + daily * Z + obs * alpha_0;
+  matrix<Type> obsdaily = obs * daily;
+  vector<Type> eta = X * beta + B * U + obsdaily * Z + obs * alpha_0;
   Type cov = exp(cov_log);
   vector<Type> scale = exp(eta) * pow(cov,2) * denom;
   Type shape = 1/pow(cov,2);

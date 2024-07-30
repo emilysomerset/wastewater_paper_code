@@ -1,14 +1,26 @@
 # > sessionInfo()
-# R version 4.2.1 (2022-06-23)
-# Platform: x86_64-apple-darwin17.0 (64-bit)
+# R version 4.4.1 (2024-06-14) -- "Race for Your Life"
+# Platform: aarch64-apple-darwin20
 # Running under: macOS Monterey 12.4
+
+# To install OSplines package
+# install.packages("remotes")
+# remotes::install_github("AgueroZZ/OSplines")
 
 library(OSplines) # OSplines_0.1.1
 library(aghq) # aghq_0.4.1
-library(readr) # readr_2.1.2
-library(dplyr) # dplyr_1.1.2
+library(readr) # readr_2.1.5
+library(dplyr) # dplyr_1.1.4
 library(magrittr) # magrittr_2.0.3 
-library(lubridate) # lubridate_1.8.0 
+library(lubridate) # lubridate_1.9.3 
+library(Matrix) # Matrix_1.7-0 
+library(TMB) #TMB_1.9.14 
+
+compute_weights_precision <- function(x){
+  d <- diff(x)
+  Precweights <- diag(d)
+  Precweights
+}
 
 setwd('./section 3.2/')
 
@@ -35,20 +47,24 @@ work_d <- raw_d %>%
 # but is between 500–1000 cp/g dry weight.
 
 df <- work_d %>% 
-  dplyr::mutate("y" = rsv_gc_g_dry_weight, # RSV (gc/g)
-                "denom" = pm_mo_v_gc_g_dry_weight) %>% # We normalize by PMMoV (gc/g)
-  mutate(censored_y = ifelse(y == 0, TRUE, FALSE),   # if value of 0, censored value
-         y = ifelse(y==0, 1000, y))   # replace the outcome value to the limit of detection
+  dplyr::mutate("y" = rsv_gc_g_dry_weight,
+                "denom" = pm_mo_v_gc_g_dry_weight) %>% # no censored denom
+  mutate(censored_y = ifelse(y == 0, TRUE, FALSE), 
+         y = ifelse(y==0, 1000, y)) 
 
 
-rr = df %>% filter(!is.na(y)) %$% sample_date %>% range()  # find out the range of observed data
+rr = df %>% filter(!is.na(y)) %$% sample_date %>% range()
 
-df <- expand.grid(sample_date = seq(rr[1],rr[2],1),  # create a grid of days between this range
+df <- expand.grid(sample_date = seq(rr[1],rr[2],1),
                   site_id = unique(df$site_id)) %>% 
   left_join(df, by = c("sample_date","site_id")) %>% 
   dplyr::select(sample_date, site_id,  y, denom, censored_y) 
 
-# Arrange data in ascending time order for each station. 
+summary(df$censored_y)
+
+
+# df %>% filter(censored_y == FALSE) %>% ggplot(aes(sample_date, log(y), col = site_id))+geom_line()+geom_point()+ facet_wrap(~site_id, ncol = 5)
+
 df =df %>%  
   arrange(site_id,sample_date) %>% 
   ungroup() 
@@ -127,6 +143,10 @@ tmbdat <- list(
   station = as(station, 'dgTMatrix'),
   knots = knots
 )
+# 
+compile(file="./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored.cpp")
+try(dyn.unload(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored")),silent = TRUE)
+dyn.load(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored"))
 
 prior_IWP <- prior_conversion(d=20, prior =list(u=log(2),alpha = 0.5),p=polyOrder)
 
@@ -153,15 +173,11 @@ tmbparams <- list(
 )
 
 
-compile(file="./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored_denom.cpp")
-try(dyn.unload(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored_denom")),silent = TRUE)
-dyn.load(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored_denom"))
-
 ff <- TMB::MakeADFun(
   data = tmbdat,
   parameters = tmbparams,
   random = "W",
-  DLL = "model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored_denom",
+  DLL = "model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored",
   silent = TRUE
 )
 
