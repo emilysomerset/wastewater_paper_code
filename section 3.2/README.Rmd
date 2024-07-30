@@ -1,13 +1,13 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from the README.Rmd. Please edit that file -->
 
 # RSV concentrations in Central California, USA
+This is the code to replicate the results in Section 3.2 of the manuscript. You will need the following libraries. The R version used for this analysis and the package versions are listed below. 
 
-This is the code to replicate the results in Section 3.2 of the
-manuscript. You will need the following libraries. The R version used
-for this analysis and the package versions are listed below.
-
-``` r
+```{r setup, warning=FALSE, message=FALSE}
 # > sessionInfo()
 # R version 4.4.1 (2024-06-14) -- "Race for Your Life"
 # Platform: aarch64-apple-darwin20
@@ -29,11 +29,9 @@ library(ggplot2) # ggplot2_3.5.1
 ```
 
 ## Data
+The RSV concentration data is found in the data folder. Set your working directory to Section 3.2 and run the following code:
 
-The RSV concentration data is found in the data folder. Set your working
-directory to Section 3.2 and run the following code:
-
-``` r
+```{r, warning=FALSE, message=FALSE}
 raw_d <- read_csv("./data/SCAN_AllPlants_SDR_7April23_rev.csv")
 
 # creating a sample_date and renaming the station column
@@ -42,17 +40,12 @@ raw_d <- raw_d %>%
   rename(site_id = `Plant Abbr`) 
 ```
 
-Here is a plot of the raw data, note if a “0” appears, it means the
-assay was a non-detect. The detection limit varies by sample depending
-on the amount of solids by dry weight included, but is between 500–1000
-cp/g dry weight. RSV measurements begin on January 5th, 2022.
+Here is a plot of the raw data, note if a “0” appears, it means the assay was a non-detect. The detection limit varies by sample depending on the amount of solids by dry weight included, but is between 500–1000 cp/g dry weight. RSV measurements begin on January 5th, 2022. 
 
-``` r
+```{r, warning=FALSE, out.width="75%"}
 ggplot(raw_d %>% filter(sample_date >= "2022-01-05"), aes(sample_date,RSV_gc_g_dry_weight))+ 
   geom_point(size=0.5)+
   facet_wrap(~site_id, nrow = 3)+ 
   scale_x_date(breaks=scales::pretty_breaks(n=5), name = "",date_labels ="%b")+
   theme_bw()
 ```
-
-<img src="README_files/figure-gfm/unnamed-chunk-2-1.png" width="75%" />
