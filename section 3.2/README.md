@@ -224,12 +224,7 @@ model_results <- process_results(df_full,
                                  polyOrder,
                                  id_group = 1,  # 0 = none, 1 = station average, 2 = custom average
                                  id_group_name = NULL) # if id_group = 2, select group for custom average
-```
 
-    ## `summarise()` has grouped output by 'variable'. You can override using the
-    ## `.groups` argument.
-
-``` r
 df_full <- model_results$df_full
 station_ave_df = model_results$station_ave_df
 df_names = data.frame(site_id = c("Dav",

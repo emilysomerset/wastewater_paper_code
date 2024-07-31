@@ -168,7 +168,7 @@ save(file="model1.RData", list = c("df_full","marginals","samps1","tmbdat","poly
 
 ## Processing the Results of the Proposed Model
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 load("model1.RData")
 # This code can take a little while to run. I would suggest saving the results after you run it. 
 #id_group = 0 for none, =1 for station average, =2 for custom average
