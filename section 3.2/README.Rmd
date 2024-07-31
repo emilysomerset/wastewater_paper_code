@@ -54,7 +54,7 @@ work_d <- raw_d %>% clean_names()
 
 Here is a plot of the raw data, note if a “0” appears, it means the assay was a non-detect. The detection limit varies by sample depending on the amount of solids by dry weight included, but is between 500–1000 cp/g dry weight. RSV measurements begin on January 5th, 2022. More information about the data is found in https://www.nature.com/articles/s41597-023-02297-7.
 
-```{r, warning=FALSE, out.width="75%"}
+```{r, warning=FALSE, out.width="100%"}
 ggplot(work_d %>% filter(sample_date >= "2022-01-05"), aes(sample_date,rsv_gc_g_dry_weight))+ 
   geom_point(size=0.2)+
   facet_wrap(~site_id, nrow = 3)+ 
@@ -217,7 +217,7 @@ df_full <- df_full %>%
 
 ### Figure 2 in Manuscript
 
-```{r, warning=FALSE, message=FALSE, out.width="75%"}
+```{r, warning=FALSE, message=FALSE, out.width="100%"}
 gg1 <- df_full %>% 
   mutate(norm = y/denom) %>% 
   ggplot(aes(x = sample_date,norm)) +
@@ -241,7 +241,7 @@ gg1
 
 ### Plots in the Appendix: Figure 8
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE,out.width="100%"}
 
 
 ## exp(V(t))
@@ -362,7 +362,7 @@ fest1
 
 ### Plots in the Appendix: Figure 9
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE,out.width="100%"}
 
 # Prediction SD
 
