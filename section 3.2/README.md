@@ -72,7 +72,7 @@ ggplot(work_d %>% filter(sample_date >= "2022-01-05"), aes(sample_date,rsv_gc_g_
   theme_bw()
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="100%" />
+<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="75%" />
 
 ## Prepping Data for Modeling
 
@@ -280,7 +280,7 @@ gg1 <- df_full %>%
 gg1
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="100%" />
+<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="75%" />
 
 ### Plots in the Appendix: Figure 8
 
@@ -401,7 +401,7 @@ fest1 = plot_grid(add_sub(gg1,"a) Common signal",size = 11),
 fest1
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-9-1.png" width="100%" />
+<img src="README_files/figure-gfm/unnamed-chunk-9-1.png" width="75%" />
 
 ### Plots in the Appendix: Figure 9
 
@@ -558,4 +558,4 @@ gg <- cowplot::plot_grid(posterior_sigma_s + ggtitle(expression(sigma(20))),
 gg
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="100%" />
+<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="75%" />
