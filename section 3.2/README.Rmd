@@ -242,10 +242,9 @@ gg1
 ### Plots in the Appendix: Figure 8
 
 ```{r, warning=FALSE, message=FALSE,out.width="75%"}
-
+##
 
 ## exp(V(t))
-
 gg1 <- df_full %>% 
   group_by(sample_date) %>% 
   slice(1) %>%
