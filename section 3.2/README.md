@@ -298,7 +298,7 @@ gg1 <- df_full %>%
   scale_y_continuous(name = "exp(V(t))", 
                      breaks = scales::pretty_breaks(n=5),
                      labels = function(x){format(x, scientific = TRUE)})+ 
-  scale_x_date(breaks=scales::pretty_breaks(n=10), name = "",date_labels ="%b")+
+  scale_x_date(breaks=scales::pretty_breaks(n=5), name = "",date_labels ="%b")+
   theme(axis.title.y = element_text(size = 12),
         axis.text.x.top = element_text(vjust = -68),
         axis.ticks.x.top = element_blank(),
@@ -318,7 +318,7 @@ gg2 <- df_full %>%
                      breaks = scales::pretty_breaks(n=5),
                      labels = function(x){format(x, scientific = TRUE)})+ 
   geom_hline(yintercept=0, lty="dashed")+
-  scale_x_date(breaks=scales::pretty_breaks(n=10), name = "",date_labels ="%b")+
+  scale_x_date(breaks=scales::pretty_breaks(n=5), name = "",date_labels ="%b")+
   theme(axis.title.y = element_text(size = 12),
         axis.text.x.top = element_text(vjust = -68),
         axis.ticks.x.top = element_blank(),
@@ -333,7 +333,7 @@ gg3 <- station_ave_df %>%
   scale_y_continuous(name = expression(paste(bar(mu),"(t)")),
                      breaks = scales::pretty_breaks(n=5),
                      labels = function(x){format(x, scientific = TRUE)})+
-  scale_x_date(breaks=scales::pretty_breaks(n=10), name = "",date_labels ="%b")+
+  scale_x_date(breaks=scales::pretty_breaks(n=5), name = "",date_labels ="%b")+
   theme(axis.title.y = element_text(size = 16),
         axis.text.x.top = element_text(vjust = -68),
         axis.ticks.x.top = element_blank(),
@@ -348,7 +348,7 @@ gg4 <- station_ave_df %>%
                      breaks = scales::pretty_breaks(n=5),
                      labels = function(x){format(x, scientific = TRUE)})+
   geom_hline(yintercept=0, lty="dashed")+
-  scale_x_date(breaks=scales::pretty_breaks(n=10), name = "",date_labels ="%b")+
+  scale_x_date(breaks=scales::pretty_breaks(n=5), name = "",date_labels ="%b")+
   theme(axis.title.y = element_text(size = 16),
         axis.text.x.top = element_text(vjust = -68),
         axis.ticks.x.top = element_blank(),
@@ -365,7 +365,7 @@ gg5 <- df_full %>%
   scale_y_continuous(name = expression(paste(mu[i],"(t)")), 
                      breaks = scales::pretty_breaks(n=5),
                      labels = function(x){format(x, scientific = TRUE)})+ 
-  scale_x_date(breaks=scales::pretty_breaks(n=10), name = "",date_labels ="%b")+
+  scale_x_date(breaks=scales::pretty_breaks(n=5), name = "",date_labels ="%b")+
   theme(axis.title.y = element_text(size = 16),
         axis.text.x.top = element_text(vjust = -68),
         axis.ticks.x.top = element_blank(),
@@ -382,7 +382,7 @@ gg6 <- df_full %>%
   scale_y_continuous(name = expression(paste(mu[i],"(t)'")), 
                      breaks = scales::pretty_breaks(n=5),
                      labels = function(x){format(x, scientific = TRUE)})+ 
-  scale_x_date(breaks=scales::pretty_breaks(n=10), name = "",date_labels ="%b")+
+  scale_x_date(breaks=scales::pretty_breaks(n=5), name = "",date_labels ="%b")+
   theme(axis.title.y = element_text(size = 16),
         axis.text.x.top = element_text(vjust = -68),
         axis.ticks.x.top = element_blank(),
