@@ -1,11 +1,10 @@
-# > sessionInfo()
-# R version 4.4.1 (2024-06-14) -- "Race for Your Life"
-# Platform: aarch64-apple-darwin20
-# Running under: macOS Monterey 12.4
 
-# To install OSplines package
-# install.packages("remotes")
-# remotes::install_github("AgueroZZ/OSplines")
+prep_data <- function(outcome_column_name,
+                      denom_column_name,
+                      site_id, 
+                      sample_date,
+                      data,
+                      polyOrder){
 
 library(OSplines) # OSplines_0.1.1
 library(aghq) # aghq_0.4.1
@@ -16,41 +15,19 @@ library(lubridate) # lubridate_1.9.3
 library(Matrix) # Matrix_1.7-0 
 library(TMB) #TMB_1.9.14 
 
+# Needed function
 compute_weights_precision <- function(x){
   d <- diff(x)
   Precweights <- diag(d)
   Precweights
 }
 
-setwd('./section 3.2/')
-
-raw_d <- read_csv("./data/SCAN_AllPlants_SDR_7April23_rev.csv")
-
-
-raw_d <- raw_d %>% 
-  mutate(sample_date = ymd(paste0(Year,"-",Month,"-",Day))) %>% 
-  rename(site_id = `Plant Abbr`) 
-
-# clean column names
-work_d <- raw_d %>% 
-  janitor::clean_names() 
-
-
-## outcome name: 'y'
-## If no censoring, create column censored_y = FALSE
-## If no normalizing value create column: denom = 1
-## name the station column: "site_id"
-## name the date: "sample_date"
-
-# f a “0” appears, it means the assay was a non-detect. 
-# The detection limit varies by sample depending on the amount of solids by dry weight included, 
-# but is between 500–1000 cp/g dry weight.
-
-df <- work_d %>% 
-  dplyr::mutate("y" = rsv_gc_g_dry_weight,
-                "denom" = pm_mo_v_gc_g_dry_weight) %>% # no censored denom
-  mutate(censored_y = ifelse(y == 0, TRUE, FALSE), 
-         y = ifelse(y==0, 1000, y)) 
+df <- data %>% 
+  rename(y = outcome_column_name, 
+         denom = denom_column_name, 
+         sample_date = sample_date, 
+         site_id = site_id) %>% 
+  dplyr::select(y, denom, sample_date, site_id, censored_y)
 
 
 rr = df %>% filter(!is.na(y)) %$% sample_date %>% range()
@@ -59,11 +36,6 @@ df <- expand.grid(sample_date = seq(rr[1],rr[2],1),
                   site_id = unique(df$site_id)) %>% 
   left_join(df, by = c("sample_date","site_id")) %>% 
   dplyr::select(sample_date, site_id,  y, denom, censored_y) 
-
-summary(df$censored_y)
-
-
-# df %>% filter(censored_y == FALSE) %>% ggplot(aes(sample_date, log(y), col = site_id))+geom_line()+geom_point()+ facet_wrap(~site_id, ncol = 5)
 
 df =df %>%  
   arrange(site_id,sample_date) %>% 
@@ -94,8 +66,8 @@ n1 = df_full %>%
 n1 <- c(n1, (nrow(df_full)))
 
 # Setup the design and precision matrix 
-polyOrder = 3
-knots <- seq(0,(max(df$t)), length.out = 50)
+polyOrder = polyOrder
+knots <- seq(0,(max(df$t)), length.out = floor((max(df$t))/7)) #knot every week
 
 B <- local_poly_helper(knots = knots, 
                        refined_x = df$t,
@@ -143,48 +115,7 @@ tmbdat <- list(
   station = as(station, 'dgTMatrix'),
   knots = knots
 )
-# 
-compile(file="./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored.cpp")
-try(dyn.unload(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored")),silent = TRUE)
-dyn.load(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored"))
 
-prior_IWP <- prior_conversion(d=20, prior =list(u=log(2),alpha = 0.5),p=polyOrder)
+return(list(tmbdat=tmbdat,df_full = df_full))
 
-# Set other priors
-tmbdat$u1 = prior_IWP$u
-tmbdat$alpha1 = 0.5
-tmbdat$u2 = 0.5
-tmbdat$alpha2 = 0.5
-tmbdat$betaprec = 0.01
-tmbdat$lambda_phi = -log(0.5)/50
-tmbdat$lambda_tau = -log(0.5)/0.5
-tmbdat$lambda_cov = -log(0.5)/0.5
-
-set.seed(2)
-init_daily <- rnorm(ncol(tmbdat$daily), 0, 0.1);
-init_W <- rnorm(ncol(tmbdat$obs),0,0.1)
-tmbparams <- list(
-  W = c(rep(0, (ncol(tmbdat$X)+ ncol(tmbdat$B))), init_daily, init_W, 0,diff(init_W)), # W = c(U,beta,Z); U = B-Spline coefficients
-  theta1 = 10, # -2log(sigma)
-  theta2 = 0,
-  cov_log = 0,
-  theta3 = 0,
-  theta4 = 0
-)
-
-
-ff <- TMB::MakeADFun(
-  data = tmbdat,
-  parameters = tmbparams,
-  random = "W",
-  DLL = "model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored",
-  silent = TRUE
-)
-
-aghq_k = 3
-
-mdl1 <- aghq::marginal_laplace_tmb(ff,k=aghq_k,startingvalue = c(10,0,0,0,0))
-
-samps1 <- aghq::sample_marginal(mdl1, M = 3000) # this is not working for some reson
-marginals <- mdl1$marginals
-save(file="~/Wastewater/toEnglish/RSV/model2.RData", list = c("df", "df_full","marginals","samps1","tmbdat","polyOrder"))
+  }
