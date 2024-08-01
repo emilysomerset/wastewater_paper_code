@@ -108,6 +108,11 @@ process_results <- function(df_full, tmbdat, samps1, polyOrder,  id_group, id_gr
   df_full$v_fixed_upr <- as.numeric(apply(v_fixed, MARGIN=1,quantile,p=0.975))
   df_full$v_fixed_lwr <- as.numeric(apply(v_fixed, MARGIN=1,quantile,p=0.025))
   
+  ## Ospline + fixed effects
+  df_full$exp_v_fixed <- as.numeric(apply(exp(v_fixed), MARGIN=1,median))
+  df_full$exp_v_fixed_upr <- as.numeric(apply(exp(v_fixed), MARGIN=1,quantile,p=0.975))
+  df_full$exp_v_fixed_lwr <- as.numeric(apply(exp(v_fixed), MARGIN=1,quantile,p=0.025))
+  
   df_full$exp_v_fixed_deriv <- as.numeric(apply(exp(v_fixed)*vderiv[,-1], MARGIN=1,median))
   df_full$exp_v_fixed_deriv_upr <- as.numeric(apply(exp(v_fixed)*vderiv[,-1], MARGIN=1,quantile, p=0.975))
   df_full$exp_v_fixed_deriv_lwr<- as.numeric(apply(exp(v_fixed)*vderiv[,-1], MARGIN=1,quantile, p=0.025))

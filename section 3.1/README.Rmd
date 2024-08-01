@@ -300,11 +300,7 @@ fest1
 
 ```
 
-
-### Plots in the Appendix: Figure ..
-
-
-### Plots in the Appendix: Figure 5
+## Plots in the Appendix: Figure 5
 
 ```{r, warning=FALSE, message=FALSE,out.width="75%"}
 load("model1.RData")
@@ -458,4 +454,76 @@ gg <- cowplot::plot_grid(posterior_sigma_s + ggtitle(expression(sigma(20))),
                    posterior_tau+ ggtitle(expression(tau[u])), nrow = 2)
 
 gg
+```
+
+
+
+### Plots in the Appendix: Figure 6
+
+```{r, warning=FALSE, message=FALSE, out.width="100%", out.height="100%"}
+load("model1_results.RData")
+
+df_city_names = data.frame(grouping_var = c("E","H","M","T","V"),
+                           city = c("Edmonton","Halifax","Montreal","Toronto","Vancouver"))
+
+city_ave_df <- city_ave_df %>% 
+  left_join(df_city_names, by = "grouping_var")
+
+
+gg1 <- city_ave_df %>% 
+  ggplot(aes(x = sample_date, ave_exp_v_u_fixed)) +
+  geom_line(size=0.2) + 
+  geom_ribbon(aes(ymax = ave_exp_v_u_fixed_upr, ymin = ave_exp_v_u_fixed_lwr), alpha = 0.4, size = 0.2, fill = "black") +
+  theme_bw()+
+  facet_wrap(~city, ncol = 1)+
+  scale_y_continuous(name = "City Average Signal", breaks = scales::pretty_breaks(n=3))+ 
+  scale_x_date(breaks=scales::pretty_breaks(n=10), name = "",date_labels ="%b",
+               sec.axis = sec_axis(name = "",trans = ~ .,labels = function(x) year(x)))+
+  theme(axis.title.y = element_text(size = 12),
+        axis.text.x.top = element_text(vjust = -150),  #have to play around with this
+        axis.ticks.x.top = element_blank())
+
+
+
+gg2 <- city_ave_df %>% 
+  ggplot(aes(x = sample_date,ave_exp_v_u_fixed_deriv)) + 
+  geom_line(size=0.2) + 
+  geom_ribbon(aes(ymax = ave_exp_v_u_fixed_deriv_upr, ymin = ave_exp_v_u_fixed_deriv_lwr), alpha = 0.4, size = 0.2, fill = "black") +
+  theme_bw()+
+  geom_hline(yintercept=0, lty="dashed")+
+  facet_wrap(~city, ncol = 1,scales = "free_y")+
+  scale_y_continuous(name = "Derivative of City Average Signal", breaks = scales::pretty_breaks(n=3))+ 
+  scale_x_date(breaks=scales::pretty_breaks(n=10), name = "",date_labels ="%b",
+               sec.axis = sec_axis(name = "",trans = ~ .,labels = function(x) year(x)))+
+  theme(axis.title.y = element_text(size = 12),
+        axis.text.x.top = element_text(vjust = -150),
+        axis.ticks.x.top = element_blank())
+
+fest3 = cowplot::plot_grid(gg1,gg2,ncol = 2)
+
+fest3
+```
+
+### Plots in the Appendix: Figure 7
+
+```{r,warning=FALSE, message=FALSE, out.width="100%"}
+load("model1_results.RData")
+
+gg1 <- df_full %>% 
+  ggplot(aes(x = sample_date, y)) +
+  facet_wrap(~site_id, nrow = 3)+
+  geom_line(aes(y = exp_v_u_fixed),size=0.2) + 
+  geom_ribbon(aes(ymax = exp_v_u_fixed_upr, ymin = exp_v_u_fixed_lwr), alpha = 0.4, size = 0.2, fill = "black") +
+  geom_ribbon(aes(ymax =exp_v_fixed_upr, ymin = exp_v_fixed_lwr), alpha = 0.4, size = 0.2, fill = "red") +
+  theme_bw()+
+  geom_point(alpha =0.5, shape = 16, size = 0.2)+
+  scale_y_continuous(name = expression(paste(mu[i],"(t)")), 
+                     trans="log",
+                     labels = function(x)format(x,digits=2),
+                     breaks = c(0.14,1,8,50,400,3000))+ 
+  scale_x_date(breaks=scales::pretty_breaks(n=6), name = "")+
+  theme(axis.title.x = element_blank())
+
+gg1
+
 ```
