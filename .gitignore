@@ -5,3 +5,5 @@
 model1.RData
 model1_results.RData
 wastewater_paper_code.Rproj
+model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored.o
+model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored.so
