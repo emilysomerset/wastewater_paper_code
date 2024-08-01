@@ -4,7 +4,8 @@ prep_data <- function(outcome_column_name,
                       site_id, 
                       sample_date,
                       data,
-                      polyOrder){
+                      polyOrder,
+                      pred_also){
 
 library(OSplines) # OSplines_0.1.1
 library(aghq) # aghq_0.4.1
@@ -29,8 +30,12 @@ df <- data %>%
          site_id = site_id) %>% 
   dplyr::select(y, denom, sample_date, site_id, censored_y)
 
+if (pred_also == TRUE){
+  rr = df %$% sample_date %>% range()}
 
-rr = df %>% filter(!is.na(y)) %$% sample_date %>% range()
+if (pred_also == FALSE){
+  rr = df %>% filter(!is.na(y)) %$% sample_date %>% range()
+}
 
 df <- expand.grid(sample_date = seq(rr[1],rr[2],1),
                   site_id = unique(df$site_id)) %>% 

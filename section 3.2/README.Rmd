@@ -127,7 +127,7 @@ tmbdat$lambda_cov = -log(0.5)/0.5
 ## Fitting the Proposed Model
 
 ```{r, warning=FALSE, message=FALSE, eval = FALSE}
-# Need to compile the C++ code to fit the proposed model for censored data
+# Need to compile the C++ code to fit the proposed model
 compile(file="./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored.cpp")
 try(dyn.unload(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored")),silent = TRUE)
 dyn.load(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored"))
