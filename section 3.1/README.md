@@ -41,9 +41,10 @@ source('process_results.R')
 
 ## Data
 
-The prepared SARS-CoV-2 concentration data is found in the data folder.
-The code to prepare this data is found in ‘create_work_d.R’ and the raw
-data is also found in the data folder.
+The prepared SARS-CoV-2 concentration data is found in the ‘data’ folder
+and is titled ‘work_d.RData’. The code to prepare this working data set
+is ‘create_work_d.R’. It is provided, along with the raw datasets, in
+the data folder.
 
 ``` r
 load("./data/work_d.RData")
@@ -339,7 +340,7 @@ fest1 = cowplot::plot_grid(add_sub(gg1,"a) Common signal",size = 11),
 fest1
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="100%" height="100%" />
+<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" width="75%" height="75%" />
 
 ## Plots in the Appendix: Figure 5
 
@@ -545,7 +546,7 @@ fest3 = cowplot::plot_grid(gg1,gg2,ncol = 2)
 fest3
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="100%" height="100%" />
+<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="75%" height="75%" />
 
 ### Plots in the Appendix: Figure 7
 
@@ -570,4 +571,4 @@ gg1 <- df_full %>%
 gg1
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-11-1.png" width="100%" />
+<img src="README_files/figure-gfm/unnamed-chunk-11-1.png" width="75%" />

@@ -190,7 +190,7 @@ save(file="model1_results.RData", list = c("df_full","station_ave_df","city_ave_
 
 ### Figure 1 in Manuscript
 
-```{r, warning = FALSE, message=FALSE, out.width="100%",out.height="100%"}
+```{r, warning = FALSE, message=FALSE, out.width="75%",out.height="75%"}
 load("model1_results.RData")
 
 gg1 <- df_full %>% 
@@ -460,7 +460,7 @@ gg
 
 ### Plots in the Appendix: Figure 6
 
-```{r, warning=FALSE, message=FALSE, out.width="100%", out.height="100%"}
+```{r, warning=FALSE, message=FALSE, out.width="75%", out.height="75%"}
 load("model1_results.RData")
 
 df_city_names = data.frame(grouping_var = c("E","H","M","T","V"),
@@ -506,7 +506,7 @@ fest3
 
 ### Plots in the Appendix: Figure 7
 
-```{r,warning=FALSE, message=FALSE, out.width="100%"}
+```{r,warning=FALSE, message=FALSE, out.width="75%"}
 load("model1_results.RData")
 
 gg1 <- df_full %>% 
