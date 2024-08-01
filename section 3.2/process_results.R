@@ -1,32 +1,32 @@
-process_results <- function(df_full, tmbdat, samps1, polyOrder,  id_group, id_group_name){
-  
 compute_post_fun <- function (samps, global_samps = NULL, knots, refined_x, p, degree = 0) {
-    if (p <= degree) {
-      return(message("Error: The degree of derivative to compute is not defined. Should consider higher order smoothing model or lower order of the derivative degree."))
-    }
-    if (is.null(global_samps)) {
-      global_samps = matrix(0, nrow = p, ncol = ncol(samps))
-    }
-    if (nrow(global_samps) != p | nrow(samps) != (length(knots) - 
-                                                  1)) {
-      return(message("Error: Incorrect dimension of global_samps or samps. Check whether the choice of p or the choice of knots are consistent with the fitted model."))
-    }
-    if (ncol(samps) != ncol(global_samps)) {
-      return(message("Error: The numbers of posterior samples do not match between the O-splines and global polynomials."))
-    }
-    X = global_poly_helper(refined_x, p = p)
-    X <- as.matrix(X[, 1:(p - degree)])
-    for (i in 1:ncol(X)) {
-      X[, i] <- (factorial(i + degree - 1)/factorial(i - 1)) * 
-        X[, i]
-    }
-    B = as(local_poly_helper(knots, refined_x = refined_x, p = (p - 
-                                                           degree)), "dgTMatrix")
-    fitted_samps_deriv <- X %*% global_samps[(1 + degree):p, 
-    ] + B %*% samps
-    result <- cbind(x = refined_x, data.frame(as.matrix(fitted_samps_deriv)))
-    result
+  if (p <= degree) {
+    return(message("Error: The degree of derivative to compute is not defined. Should consider higher order smoothing model or lower order of the derivative degree."))
   }
+  if (is.null(global_samps)) {
+    global_samps = matrix(0, nrow = p, ncol = ncol(samps))
+  }
+  if (nrow(global_samps) != p | nrow(samps) != (length(knots) - 
+                                                1)) {
+    return(message("Error: Incorrect dimension of global_samps or samps. Check whether the choice of p or the choice of knots are consistent with the fitted model."))
+  }
+  if (ncol(samps) != ncol(global_samps)) {
+    return(message("Error: The numbers of posterior samples do not match between the O-splines and global polynomials."))
+  }
+  X = global_poly_helper(refined_x, p = p)
+  X <- as.matrix(X[, 1:(p - degree)])
+  for (i in 1:ncol(X)) {
+    X[, i] <- (factorial(i + degree - 1)/factorial(i - 1)) * 
+      X[, i]
+  }
+  B = as(local_poly_helper(knots, refined_x = refined_x, p = (p - 
+                                                                degree)), "dgTMatrix")
+  fitted_samps_deriv <- X %*% global_samps[(1 + degree):p, 
+  ] + B %*% samps
+  result <- cbind(x = refined_x, data.frame(as.matrix(fitted_samps_deriv)))
+  result
+}
+
+process_results <- function(df_full, tmbdat, samps1, polyOrder,  id_group, id_group_name = NULL){
   
   P = as.matrix(tmbdat$P)
   X = as.matrix(tmbdat$X)
@@ -108,6 +108,11 @@ compute_post_fun <- function (samps, global_samps = NULL, knots, refined_x, p, d
   df_full$v_fixed_upr <- as.numeric(apply(v_fixed, MARGIN=1,quantile,p=0.975))
   df_full$v_fixed_lwr <- as.numeric(apply(v_fixed, MARGIN=1,quantile,p=0.025))
   
+  ## Ospline + fixed effects
+  df_full$exp_v_fixed <- as.numeric(apply(exp(v_fixed), MARGIN=1,median))
+  df_full$exp_v_fixed_upr <- as.numeric(apply(exp(v_fixed), MARGIN=1,quantile,p=0.975))
+  df_full$exp_v_fixed_lwr <- as.numeric(apply(exp(v_fixed), MARGIN=1,quantile,p=0.025))
+  
   df_full$exp_v_fixed_deriv <- as.numeric(apply(exp(v_fixed)*vderiv[,-1], MARGIN=1,median))
   df_full$exp_v_fixed_deriv_upr <- as.numeric(apply(exp(v_fixed)*vderiv[,-1], MARGIN=1,quantile, p=0.975))
   df_full$exp_v_fixed_deriv_lwr<- as.numeric(apply(exp(v_fixed)*vderiv[,-1], MARGIN=1,quantile, p=0.025))
@@ -130,21 +135,22 @@ compute_post_fun <- function (samps, global_samps = NULL, knots, refined_x, p, d
   df_full$exp_v_deriv_upr <- as.numeric(apply((exp(v[,-1]) * vderiv[,-1]), MARGIN=1,quantile, 0.975))
   df_full$exp_v_deriv_lwr<- as.numeric(apply((exp(v[,-1]) * vderiv[,-1]), MARGIN=1,quantile, 0.025))
   
-if ( id_group == 1){
+if ( (1 %in% id_group) | (2 %in% id_group) ){
   post_samps_df <- df_full %>% 
-    dplyr::select('sample_date','site_id') %>% 
+    dplyr::select('sample_date','site_id',id_group_name) %>% 
     cbind(as.data.frame(v_u_fixed)) %>% 
-    melt(id.vars = 1:2)
+    melt(id.vars = 1:(2+length(id_group_name)))
   
   post_samps_df_deriv <- df_full %>% 
-    dplyr::select('sample_date','site_id') %>% 
+    dplyr::select('sample_date','site_id',id_group_name) %>% 
     cbind(as.data.frame(v_u_fixed_deriv)) %>% 
-    melt(id.vars = 1:2)
+    melt(id.vars = 1:(2+length(id_group_name)))
   
   output_postsamps = post_samps_df %>% 
     rename("v_u_fixed" = value) %>% 
-    cbind(post_samps_df_deriv%>% dplyr::select(value) %>% rename("v_u_fixed_deriv"= value) ) 
+    cbind(post_samps_df_deriv%>% dplyr::select(value) %>% rename("v_u_fixed_deriv"= value) )}
   
+if (1 %in% id_group){
   tmp<- output_postsamps  %>% 
     group_by(variable, sample_date) %>% 
     summarise(ave_exps = mean(exp(v_u_fixed)),
@@ -159,5 +165,21 @@ if ( id_group == 1){
               ave_exp_v_u_fixed_deriv_lwr = quantile(ave_exps_deriv, 0.025),
               post_prob_ave_exp_v_u_fixed_deriv = length(which(ave_exps_deriv>0))/length(ave_exps_deriv))}
   
-  return(list(df_full=df_full, station_ave_df = tmp))
+  if (2 %in% id_group){
+    tmp2<- output_postsamps  %>% 
+      rename(grouping_var = id_group_name) %>% 
+      group_by(variable, sample_date, grouping_var) %>% 
+      summarise(ave_exps = mean(exp(v_u_fixed)),
+                ave_exps_deriv = mean(v_u_fixed_deriv*exp(v_u_fixed))) %>% 
+      ungroup() %>% 
+      group_by(sample_date, grouping_var) %>% 
+      summarise(ave_exp_v_u_fixed = median(ave_exps),
+                ave_exp_v_u_fixed_upr = quantile(ave_exps, 0.975),
+                ave_exp_v_u_fixed_lwr = quantile(ave_exps, 0.025),
+                ave_exp_v_u_fixed_deriv = median(ave_exps_deriv),
+                ave_exp_v_u_fixed_deriv_upr = quantile(ave_exps_deriv, 0.975),
+                ave_exp_v_u_fixed_deriv_lwr = quantile(ave_exps_deriv, 0.025),
+                post_prob_ave_exp_v_u_fixed_deriv = length(which(ave_exps_deriv>0))/length(ave_exps_deriv))}
+  
+  return(list(df_full=df_full, station_ave_df = tmp,custom_ave_df = tmp2))
 }
