@@ -115,7 +115,8 @@ data_foranalysis <- prep_data(outcome_column_name = "y",
                     site_id = "site_id",   # column for wastewater station IDs
                     sample_date = "sample_date",  #date column. Should be year-month-day
                     data = work_d, # put the working data set
-                    polyOrder =3) #polynomial order for the Ospline (we recommend 3 for wastewater data)
+                    polyOrder =3, #polynomial order for the Ospline (we recommend 3 for wastewater data)
+                    pred_also = FALSE) 
 
 tmbdat <- data_foranalysis$tmbdat
 
@@ -171,7 +172,7 @@ tmbdat$lambda_cov = -log(0.5)/0.5
 ## Fitting the Proposed Model
 
 ``` r
-# Need to compile the C++ code to fit the proposed model for censored data
+# Need to compile the C++ code to fit the proposed model
 compile(file="./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored.cpp")
 try(dyn.unload(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored")),silent = TRUE)
 dyn.load(dynlib("./cpp/model_ospline_fixedeffects_daily_singleCOV_AR2_transformpaper_censored"))

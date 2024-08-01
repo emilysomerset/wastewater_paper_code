@@ -163,7 +163,7 @@ if (1 %in% id_group){
               ave_exp_v_u_fixed_deriv = median(ave_exps_deriv),
               ave_exp_v_u_fixed_deriv_upr = quantile(ave_exps_deriv, 0.975),
               ave_exp_v_u_fixed_deriv_lwr = quantile(ave_exps_deriv, 0.025),
-              post_prob_ave_exp_v_u_fixed_deriv = length(which(ave_exps_deriv>0))/length(ave_exps_deriv))}
+              post_prob_ave_exp_v_u_fixed_deriv = length(which(ave_exps_deriv>0))/length(ave_exps_deriv))}else{tmp = NULL}
   
   if (2 %in% id_group){
     tmp2<- output_postsamps  %>% 
@@ -179,7 +179,7 @@ if (1 %in% id_group){
                 ave_exp_v_u_fixed_deriv = median(ave_exps_deriv),
                 ave_exp_v_u_fixed_deriv_upr = quantile(ave_exps_deriv, 0.975),
                 ave_exp_v_u_fixed_deriv_lwr = quantile(ave_exps_deriv, 0.025),
-                post_prob_ave_exp_v_u_fixed_deriv = length(which(ave_exps_deriv>0))/length(ave_exps_deriv))}
+                post_prob_ave_exp_v_u_fixed_deriv = length(which(ave_exps_deriv>0))/length(ave_exps_deriv))}else{tmp2 = NULL}
   
   return(list(df_full=df_full, station_ave_df = tmp,custom_ave_df = tmp2))
 }

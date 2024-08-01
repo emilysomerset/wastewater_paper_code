@@ -92,7 +92,8 @@ data_foranalysis <- prep_data(outcome_column_name = "value",
                     site_id = "site_id",   # column for wastewater station IDs
                     sample_date = "sample_date",  #date column. Should be year-month-day
                     data = work_d, # put the working data set
-                    polyOrder =3) #polynomial order for the Ospline (we recommend 3 for wastewater data)
+                    polyOrder =3,  #polynomial order for the Ospline (we recommend 3 for wastewater data)
+                    pred_also = FALSE) 
 
 tmbdat <- data_foranalysis$tmbdat
 
