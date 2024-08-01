@@ -1,22 +1,13 @@
-rm(list=ls())
+# > sessionInfo()
+# R version 4.4.1 (2024-06-14) -- "Race for Your Life"
+# Platform: aarch64-apple-darwin20
+# Running under: macOS Monterey 12.4
 
-# library(fanetc)
-# library(splines)
-# library(cowplot)
-# library(OSplines)
-# library(TMB)
-# library(aghq)
-# library(bayesplot)
-# library(lemon)
+library(dplyr) # dplyr_1.1.4
+library(Matrix) # Matrix_1.7-0 
 
-library(dplyr)
-library(lubridate)
-library(magrittr)
-
-
-
-for (i in 2:103){
-  load(paste0('~/Wastewater/toEnglish/xiaotian_phac/nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))
+for (i in 1:103){
+  load(paste0('./nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))
   
   df = full_join(res_df %>% mutate(type = "train"), 
                  pred_df %>% dplyr::select(-'time.ahead') %>% mutate(type = "test"))
@@ -93,23 +84,14 @@ for (i in 2:103){
               p2_exp_corr_increase = length(which(diff2_exp_corr>0))/length(na.omit(diff2_exp_corr)),
               p7_exp_corr_increase = length(which(diff7_exp_corr>0))/length(na.omit(diff7_exp_corr)))
   
-  # ggplot(df_summary_canada %>% filter(date<="2022-01-19"), aes(date, ave_exp_f1_IS_fixed))+ 
-  #   geom_line(col = "blue")+ 
-  #   geom_ribbon(aes(ymax = ave_exp_f1_IS_fixed_upr, ymin = ave_exp_f1_IS_fixed_lwr), col = "blue", fill = "blue", alpha = 0.2)+
-  #   geom_line(aes(date, ave_exp_corr_f1_IS_fixed), col = "red")+
-  #   geom_ribbon(aes(ymax = ave_exp_corr_f1_IS_fixed_upr, ymin = ave_exp_corr_f1_IS_fixed_lwr), col = "red", fill = "red", alpha = 0.2)
-  # 
-  # ggplot(df_summary_canada%>% filter(date<="2022-01-19"), aes(date, p1_exp_increase))+ 
-  #   geom_line(col = "blue")+ 
-  #   geom_line(aes(date, p1_exp_corr_increase), col = "red")
-  
-  if (file.exists(paste0('~/Wastewater/toEnglish/xiaotian_phac/nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))) {
+  # this was done to save space on my computer.     
+  if (file.exists(paste0('./nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))) {
     #Delete file if it exists
-    file.remove(paste0('~/Wastewater/toEnglish/xiaotian_phac/nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))
+    file.remove(paste0('./nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))
   }
   
-  write.csv(df_summary, file = paste0('~/Wastewater/toEnglish/xiaotian_phac/nowcast_nowave_morebasis_xiaotian/summary_model',i,'.csv'))
-  write.csv(df_summary_canada, file = paste0('~/Wastewater/toEnglish/xiaotian_phac/nowcast_nowave_morebasis_xiaotian/CAN_summary_model',i,'.csv'))
+  write.csv(df_summary, file = paste0('./nowcast_nowave_morebasis_xiaotian/summary_model',i,'.csv'))
+  write.csv(df_summary_canada, file = paste0('./nowcast_nowave_morebasis_xiaotian/CAN_summary_model',i,'.csv'))
 }
 
 
