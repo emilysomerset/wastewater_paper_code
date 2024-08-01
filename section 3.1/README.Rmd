@@ -38,7 +38,7 @@ source('process_results.R')
 ```
 
 ## Data
-The prepared SARS-CoV-2 concentration data is found in the data folder. The code to prepare this data is found in 'create_work_d.R' and the raw data is also found in the data folder. 
+The prepared SARS-CoV-2 concentration data is found in the 'data' folder and is titled 'work_d.RData'. The code to prepare this working data set is 'create_work_d.R'. It is provided, along with the raw datasets, in the data folder. 
 
 ```{r, warning=FALSE, message=FALSE}
 load("./data/work_d.RData")
