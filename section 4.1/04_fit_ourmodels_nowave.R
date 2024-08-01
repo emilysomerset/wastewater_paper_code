@@ -157,12 +157,18 @@ work_d <- raw_d %>%
   mutate(sample_date = ymd(sample_date)) %>% 
   ungroup()
 
-dates_totry <- seq(from=ymd("2021-11-20"),length.out =61,by=1)
-dates_with_newdata <- work_d %>% 
-  filter(!is.na(value_raw))%$% sample_date %>% unique()
-dates_totry = dates_totry[dates_totry %in% dates_with_newdata]
 
-for (i in 1:11){
+
+
+dates_with_newdata <- work_d %>% 
+  filter(sample_date >= ymd('2022-12-01') & sample_date <= ymd('2023-03-31')) %>% 
+  filter(!is.na(value_raw))%$% sample_date %>% unique()
+
+
+# dates_totry = dates_with_newdata[seq(1, length(dates_with_newdata),7)]
+dates_totry = dates_with_newdata
+
+for (i in 102:length(dates_totry)){
   
   df <- work_d %>% 
     dplyr::mutate("y" = value_raw) 
@@ -225,12 +231,11 @@ for (i in 1:11){
   Xfstat <- as.matrix(Xfstat)
   X = cbind(X_global, Xfstat)
   
-  # daily <- model.matrix(~t -1,
+  # daily <- model.matrix(~t -1, 
   #                       data = df %>% mutate(t = factor(t)))
   
   daily <- model.matrix(~t -1,
                         data = df_full %>% mutate(t = factor(t)))
-  
   
   
   obs <- model.matrix(~nindex -1, data = df_full %>% mutate(nindex=factor(nindex)) %>% filter(obs))
@@ -303,7 +308,7 @@ for (i in 1:11){
   
   samps1 <- aghq::sample_marginal(mdl1, M = 3000) 
   marginals <- mdl1$marginals
-  save(file=paste0("~/Wastewater/toEnglish/xiaotian_phac/nowcast_firstwave/model",i,".RData"), list = c("df", "df_full","marginals","samps1","tmbdat","polyOrder"))
+  save(file=paste0("~/Wastewater/toEnglish/xiaotian_phac/nowcast_nowave/model",i,".RData"), list = c("df", "df_full","marginals","samps1","tmbdat","polyOrder"))
   rm(list = c("mdl1","samps1","marginals"))
   print(i)
 }
