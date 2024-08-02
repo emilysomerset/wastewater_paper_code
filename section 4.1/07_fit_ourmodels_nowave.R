@@ -47,6 +47,7 @@ for (i in 1:length(dates_totry)){
                                 pred_also = TRUE)
   
   tmbdat <- data_foranalysis$tmbdat
+  df_full <- data_foranalysis$df_full
   
   polyOrder = 3
   prior_IWP <- prior_conversion(d=20, prior =list(u=log(2),alpha = 0.5),p=polyOrder)

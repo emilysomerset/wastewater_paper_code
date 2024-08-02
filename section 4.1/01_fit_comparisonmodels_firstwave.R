@@ -22,6 +22,7 @@ modeldata2 <- modeldata2 %>%
          "Location" = site_id) %>% 
   mutate(log.value.raw = log(value))
 
+
 date_range <-modeldata2$date %>% range()
 
 modeldata2 <- data.frame(date = rep(seq(date_range[1], date_range[2],1),each=15),
@@ -74,5 +75,25 @@ for (i in 1:length(dates_totry)) {
   res_df <- res$df
   
   # this is how I saved the results. 
-  # save(file=paste0("./nowcast_firstwave_xiaotian/model",i,".RData"), list = c("trainingdata","testingdata", "res_df","pred_df"))
+  save(file=paste0("./nowcast_firstwave_xiaotian/model",i,".RData"), list = c("trainingdata","testingdata", "res_df","pred_df"))
 }
+
+## We also need to run this model on the full data: 
+data_full <- modeldata2 
+
+set.seed(2)
+
+res <- WWmodel_meanconcentrate(modeldata = data_full, 
+                               ID = c("Location", "target"), 
+                               date = "date", 
+                               value = "log.value.raw", 
+                               covariate = NULL, 
+                               iteration = 5000, 
+                               burnin = 2500, 
+                               cores = 4,
+                               chains=4,
+                               nbasis = 50)
+
+res_df <- res$df
+
+save(file=paste0("./nowcast_firstwave_xiaotian/fullmodel.RData"), list = c("data_full","res_df"))

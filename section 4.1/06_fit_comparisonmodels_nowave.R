@@ -78,7 +78,7 @@ for (i in 1:length(dates_totry)) {
   res_df <- res$df
   
   # this is how I saved the results. 
-  # save(file=paste0("./nowcast_nowave_morebasis_xiaotian/model",i,".RData"), list = c("trainingdata","testingdata", "res_df","pred_df"))
+  save(file=paste0("./nowcast_nowave_morebasis_xiaotian/model",i,".RData"), list = c("trainingdata","testingdata", "res_df","pred_df"))
 }
 
 

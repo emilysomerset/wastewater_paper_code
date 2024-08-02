@@ -6,23 +6,23 @@
 library(dplyr) # dplyr_1.1.4
 library(Matrix) # Matrix_1.7-0 
 
-
-for (i in 1:54){
-  load(paste0('./nowcast_firstwave_xiaotian/model',i,'.RData'))
+for (i in 1:103){
+  load(paste0('./nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))
   
   df = full_join(res_df %>% mutate(type = "train"), 
                  pred_df %>% dplyr::select(-'time.ahead') %>% mutate(type = "test"))
   
   df = df %>% 
     group_by(Location, date) %>% 
-    mutate(vv = 1:2501) %>% # change this to be the number of iterations - burnin + 1
+    mutate(vv = 1:2501) %>%
     group_by(Location,vv) %>% 
     arrange(date) %>% 
     mutate(diff1 = c(NA,diff(value, lag = 1)),
            diff2 = c(rep(NA,2), diff(value, lag = 2)),
            diff7 = c(rep(NA,7), diff(value, lag = 7))) 
   
-  data_full = full_join(trainingdata, testingdata)
+  data_full = full_join(trainingdata, testingdata)%>% 
+    rename(value.raw = value)
   
   df <- df %>% 
     left_join(data_full, by = c("date","Location"))
@@ -85,15 +85,14 @@ for (i in 1:54){
               p2_exp_corr_increase = length(which(diff2_exp_corr>0))/length(na.omit(diff2_exp_corr)),
               p7_exp_corr_increase = length(which(diff7_exp_corr>0))/length(na.omit(diff7_exp_corr)))
   
-
-# this was done to save space on my computer.   
-  if (file.exists(paste0('./nowcast_firstwave_xiaotian/model',i,'.RData'))) {
+  # this was done to save space on my computer.     
+  if (file.exists(paste0('./nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))) {
     #Delete file if it exists
-    file.remove(paste0('./nowcast_firstwave_xiaotian/model',i,'.RData'))
+    file.remove(paste0('./nowcast_nowave_morebasis_xiaotian/model',i,'.RData'))
   }
   
-  write.csv(df_summary, file = paste0('./nowcast_firstwave_xiaotian/summary_model',i,'.csv'))
-  write.csv(df_summary_canada, file = paste0('./nowcast_firstwave_xiaotian/CAN_summary_model',i,'.csv'))
+  write.csv(df_summary, file = paste0('./nowcast_nowave_morebasis_xiaotian/summary_model',i,'.csv'))
+  write.csv(df_summary_canada, file = paste0('./nowcast_nowave_morebasis_xiaotian/CAN_summary_model',i,'.csv'))
 }
 
 
