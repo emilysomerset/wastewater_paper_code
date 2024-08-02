@@ -5,7 +5,8 @@ prep_data <- function(outcome_column_name,
                       sample_date,
                       data,
                       polyOrder,
-                      pred_also){
+                      pred_also,
+                      nknots = NULL){
 
 library(OSplines) # OSplines_0.1.1
 library(aghq) # aghq_0.4.1
@@ -72,7 +73,9 @@ n1 <- c(n1, (nrow(df_full)))
 
 # Setup the design and precision matrix 
 polyOrder = polyOrder
-knots <- seq(0,(max(df$t)), length.out = floor((max(df$t))/7)) #knot every week
+if (is.null(nknots)){knots <- seq(0,(max(df$t)), length.out = floor((max(df$t))/7))}else{
+  knots <- seq(0,(max(df$t)), length.out = nknots)
+}
 
 B <- local_poly_helper(knots = knots, 
                        refined_x = df$t,
