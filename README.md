@@ -1,8 +1,8 @@
 # wastewater_paper_code
-The online repository for the codes to replicate the results in "Insert paper name here"
+The online repository for the codes to replicate the results in "Wastewater surveillance using differentiable Gaussian processes"
 
 # Data and Scripts
-The examples in the main paper are replicated in the following scripts.
+The examples and data the main paper are replicated in the following folders.
 
 - Section 3.1
 
